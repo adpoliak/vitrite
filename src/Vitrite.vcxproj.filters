@@ -37,4 +37,7 @@
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="about_vitrite.html" />
+  </ItemGroup>
 </Project>

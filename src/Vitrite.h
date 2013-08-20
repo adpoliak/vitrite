@@ -1,5 +1,6 @@
 #ifndef VITRITE_H
 #define VITRITE_H
+// Modifications by adpoliak to address issues with running pre-compiled binaries on Win7
 
 // Prototypes
 BOOL AddIconToSystemTray(HWND hWnd, UINT uID, LPSTR lpszTip); 
@@ -15,7 +16,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #define IDM_MEXIT		500
 #define IDM_MMAIN		501
 
-#define VITRITE_VERSION	"1.1.1"
+#define VITRITE_VERSION	"1.1.1-adpoliak"
 
 
 #endif	// VITRITE_H

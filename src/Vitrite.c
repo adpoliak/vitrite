@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with Vitrite; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+// Modifications by adpoliak to address issues with running pre-compiled binaries on Win7
 
 // This app requires Windows 2000 or newer
 #include "resource.h"
@@ -42,8 +43,7 @@ BOOL AddIconToSystemTray(HWND hWnd, UINT uID, LPSTR lpszTip) {
 	tnid.uID = uID;
 	tnid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP; 
 	tnid.uCallbackMessage = TRAY_CALLBACK;
-	tnid.hIcon = (HICON) LoadImage(g_hInstance, MAKEINTRESOURCE(IDI_ICON1),
-		IMAGE_ICON, 16, 16, 0);
+	tnid.hIcon = (HICON) LoadImage(g_hInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, 0);
 
 	if (lpszTip) 
 		lstrcpyn(tnid.szTip, lpszTip, sizeof(tnid.szTip)); 
@@ -78,10 +78,7 @@ BOOL ShowPopupMenu(HWND hWnd, POINT pOint) {
 		return FALSE;
 	}
 
-	AppendMenu(hPopup,
-		MF_STRING | ((g_bWindowShown)? MF_GRAYED : 0),
-		IDM_MMAIN,
-		"&About");	
+	AppendMenu(hPopup, MF_STRING | ((g_bWindowShown)? MF_GRAYED : 0), IDM_MMAIN, "&About");	
 	AppendMenu(hPopup, MF_STRING, IDM_MEXIT, "E&xit");
 
 	// We have to do some MS voodoo to make the taskbar 
@@ -89,8 +86,7 @@ BOOL ShowPopupMenu(HWND hWnd, POINT pOint) {
 	// Microsoft is to blame on this one.
 	// See MS Knowledgebase article Q135788 for more info.
 	SetForegroundWindow(hWnd);		// [MS voodoo]
-	if (!TrackPopupMenuEx(hPopup, TPM_RIGHTALIGN | TPM_BOTTOMALIGN,
-		pOint.x, pOint.y, hWnd, NULL)) {
+	if (!TrackPopupMenuEx(hPopup, TPM_RIGHTALIGN | TPM_BOTTOMALIGN, pOint.x, pOint.y, hWnd, NULL)) {
 		MessageBox(NULL, "TrackPopupMenu failed", "Error", MB_OK);
 		return FALSE;
 	}
@@ -99,20 +95,14 @@ BOOL ShowPopupMenu(HWND hWnd, POINT pOint) {
 	return TRUE;
 }
 
-BOOL APIENTRY MainDlgProc(HWND hDlg,
-						  UINT Msg,
-						  UINT wParam,
-						  LONG lParam) {
+BOOL APIENTRY MainDlgProc(HWND hDlg, UINT Msg, UINT wParam, LONG lParam) {
 	RECT  DlgRect;
 	POINT  pMenuPoint;
 
 	switch(Msg) {
 	case WM_INITDIALOG :
 		GetWindowRect(hDlg, &DlgRect);
-		SetWindowPos(hDlg, HWND_TOP,
-			(GetSystemMetrics(SM_CXSCREEN)-(DlgRect.right-DlgRect.left))/2, 
-			(GetSystemMetrics(SM_CYSCREEN)-(DlgRect.bottom-DlgRect.top))/2,
-			0, 0, SWP_NOSIZE);
+		SetWindowPos(hDlg, HWND_TOP, (GetSystemMetrics(SM_CXSCREEN)-(DlgRect.right-DlgRect.left))/2, (GetSystemMetrics(SM_CYSCREEN)-(DlgRect.bottom-DlgRect.top))/2, 0, 0, SWP_NOSIZE);
 		return(TRUE);
 
 	case WM_DESTROY :
@@ -158,8 +148,7 @@ BOOL APIENTRY MainDlgProc(HWND hDlg,
 	return(FALSE);
 }
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-				   LPSTR     lpCmdLine, int       nCmdShow) {	
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {	
 	HWND  hWnd;
 	HANDLE  ghMutex;
 	MSG  Msg;
@@ -170,13 +159,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	memset(&OSVInfo, 0, sizeof(OSVInfo));
 	OSVInfo.dwOSVersionInfoSize = sizeof(OSVInfo);
 	if (!GetVersionEx(&OSVInfo)) {
-		MessageBox(NULL, "Call to 'GetVersionEx()' failed",
-			"Critical Error", MB_OK | MB_ICONSTOP);
+		MessageBox(NULL, "Call to 'GetVersionEx()' failed", "Critical Error", MB_OK | MB_ICONSTOP);
 		return 1;
 	} else {
 		if (OSVInfo.dwMajorVersion < 5) {
-			MessageBox(NULL, "Sorry - this program requires Windows 2000 or higher.",
-				"Unfortunate Error", MB_OK | MB_ICONSTOP);
+			MessageBox(NULL, "Sorry - this program requires Windows 2000 or higher.", "Unfortunate Error", MB_OK | MB_ICONSTOP);
 			return 1;
 		}
 	}
@@ -194,15 +181,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	memset(&Msg, 0, sizeof(Msg));
 	// Build/show main dialog
-	hWnd = CreateDialog(hInstance,
-		MAKEINTRESOURCE(IDD_MAIN),
-		NULL,
-		MainDlgProc);
-	SendMessage(hWnd, WM_SETICON, 
-		(WPARAM) ICON_BIG,
-		(LPARAM) (HICON) LoadImage(hInstance,
-		MAKEINTRESOURCE(IDI_ICON1),
-		IMAGE_ICON, 32, 32, 0));
+	hWnd = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_MAIN), NULL, MainDlgProc);
+	SendMessage(hWnd, WM_SETICON, (WPARAM) ICON_BIG, (LPARAM) (HICON) LoadImage(hInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, 0));
 
 	ShowWindow(hWnd, SW_HIDE);
 	g_bWindowShown = FALSE;
@@ -210,15 +190,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	wsprintf(cTrayTip, "Vitrite - %s", VITRITE_VERSION);
 	if (!AddIconToSystemTray(hWnd, IDI_ICON1, cTrayTip)) {
-		MessageBox(NULL, "Unable to put icon on taskbar.",
-			"Critical Error", MB_ICONSTOP | MB_OK);
+		MessageBox(NULL, "Unable to create Notification Area icon.", "Critical Error", MB_ICONSTOP | MB_OK);
 		DestroyWindow(hWnd);
 		return Msg.wParam;
 	}
 
 	if (InstallHook() != 0)	{
-		MessageBox(NULL, "Uh oh - the hook didn't take!", 
-			"Critical Error", MB_OK | MB_ICONSTOP);
+		MessageBox(NULL, "Unable to install keyboard hook.", "Critical Error", MB_OK | MB_ICONSTOP);
 		RemoveIconFromSystemTray(hWnd, IDI_ICON1);
 		DestroyWindow(hWnd);
 		return Msg.wParam;
@@ -228,8 +206,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		IsDialogMessage(hWnd, &Msg);
 	}
 	if (RemoveHook() != 0) {
-		MessageBox(NULL, "Oh my gawd! We couldn't get the hook out.", 
-			"Critical Error", MB_OK | MB_ICONSTOP);
+		MessageBox(NULL, "Unable to remove keyboard hook.", "Critical Error", MB_OK | MB_ICONSTOP);
 	}
 	DestroyWindow(hWnd);
 
