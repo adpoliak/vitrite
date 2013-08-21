@@ -32,7 +32,6 @@ __declspec(dllimport) int APIENTRY RemoveHook();
 
 // Globals
 HINSTANCE  g_hInstance;
-BOOL  g_bWindowShown;
 HANDLE  ghMutex;
 
 BOOL AddIconToSystemTray(HWND hWnd, UINT uID, LPSTR lpszTip) {
@@ -78,7 +77,7 @@ BOOL ShowPopupMenu(HWND hWnd, POINT pOint) {
 		return FALSE;
 	}
 
-	AppendMenu(hPopup, MF_STRING | ((g_bWindowShown)? MF_GRAYED : 0), IDM_MMAIN, "&About");	
+	AppendMenu(hPopup, MF_STRING, IDM_MMAIN, "&About");	
 	AppendMenu(hPopup, MF_STRING, IDM_MEXIT, "E&xit");
 
 	// We have to do some MS voodoo to make the taskbar 
@@ -96,13 +95,13 @@ BOOL ShowPopupMenu(HWND hWnd, POINT pOint) {
 }
 
 BOOL APIENTRY MainDlgProc(HWND hDlg, UINT Msg, UINT wParam, LONG lParam) {
-	RECT  DlgRect;
 	POINT  pMenuPoint;
-
+	TCHAR * execpath = (TCHAR*)calloc(1024,sizeof(TCHAR));
+	TCHAR * execbuf = (TCHAR*)calloc(2048,sizeof(TCHAR));
+	DWORD bufLen;
 	switch(Msg) {
 	case WM_INITDIALOG :
-		GetWindowRect(hDlg, &DlgRect);
-		SetWindowPos(hDlg, HWND_TOP, (GetSystemMetrics(SM_CXSCREEN)-(DlgRect.right-DlgRect.left))/2, (GetSystemMetrics(SM_CYSCREEN)-(DlgRect.bottom-DlgRect.top))/2, 0, 0, SWP_NOSIZE);
+		SetWindowPos(hDlg, HWND_TOP, -100, -100, 0, 0, SWP_NOSIZE);
 		return(TRUE);
 
 	case WM_DESTROY :
@@ -117,32 +116,24 @@ BOOL APIENTRY MainDlgProc(HWND hDlg, UINT Msg, UINT wParam, LONG lParam) {
 			GetCursorPos(&pMenuPoint);
 			ShowPopupMenu(hDlg, pMenuPoint);
 			return(TRUE);
-
-		case WM_LBUTTONDBLCLK :
-			ShowWindow(hDlg, SW_SHOW);
-			UpdateWindow(hDlg);
-			g_bWindowShown = TRUE;
-			return(TRUE);
 		}
 		return(TRUE);
 
 	case WM_COMMAND :
 		switch(LOWORD(wParam)) {
-		case IDOK :
-			ShowWindow(hDlg, SW_HIDE);
-			g_bWindowShown = FALSE;
-			return(TRUE);
-
 		case IDM_MEXIT :
 			PostQuitMessage(0);
 			return(TRUE);
 
 		case IDM_MMAIN :
-			ShowWindow(hDlg, SW_SHOW);
-			UpdateWindow(hDlg);
-			g_bWindowShown = TRUE;
+			bufLen = GetModuleFileName(NULL,execpath,1023);
+			if(GetLastError() != ERROR_INSUFFICIENT_BUFFER){
+				if(sprintf_s(execbuf,2047,"res://%s/%d",execpath,MAKEINTRESOURCE(IDR_HTML1)) != -1){
+					ShellExecute(NULL,"open",execbuf,NULL,NULL,SW_SHOW);
+				}
+			}
 			return(TRUE);
-		}		
+		}
 		return(TRUE);
 	}	
 	return(FALSE);
@@ -180,13 +171,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	memset(&Msg, 0, sizeof(Msg));
-	// Build/show main dialog
+	// Build dummy dialog
 	hWnd = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_MAIN), NULL, MainDlgProc);
-	SendMessage(hWnd, WM_SETICON, (WPARAM) ICON_BIG, (LPARAM) (HICON) LoadImage(hInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, 0));
-
-	ShowWindow(hWnd, SW_HIDE);
-	g_bWindowShown = FALSE;
-	UpdateWindow(hWnd);
 
 	wsprintf(cTrayTip, "Vitrite - %s", VITRITE_VERSION);
 	if (!AddIconToSystemTray(hWnd, IDI_ICON1, cTrayTip)) {
