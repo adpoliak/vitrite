@@ -35,8 +35,8 @@
 
 # Build results
 
-[Dd]ebug/
-[Rr]elease/
+[Dd]ebug(-int)?/
+[Rr]elease(-int)?/
 x64/
 build/
 [Bb]in/
