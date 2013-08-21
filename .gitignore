@@ -25,6 +25,9 @@
 *.dll
 *.tlb
 
+*.tlog
+*.lastbuildstate
+
 # User-specific files
 *.suo
 *.user
