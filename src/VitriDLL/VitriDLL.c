@@ -52,7 +52,7 @@ LRESULT CALLBACK KbHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			if ((((BYTE)GetKeyState(VK_SHIFT))>>7 || ((BYTE)GetKeyState(VK_RSHIFT))>>7 || ((BYTE)GetKeyState(VK_LSHIFT))>>7) &&
 				(((BYTE)GetKeyState(VK_CONTROL))>>7 || ((BYTE)GetKeyState(VK_RCONTROL))>>7 || ((BYTE)GetKeyState(VK_LCONTROL))>>7)) {
 				if ((wParam>=0x030) && (wParam<=0x039))	{// Is this a number key?
-					iTenths = wParam - 0x030;
+					iTenths = (int)wParam - 0x030;
 				} else if (wParam == VK_OEM_PLUS) {	// Is this the plus key?
 					memset(&wInfo, 0, sizeof(wInfo));
 					if ((hActiveWindow = GetForegroundWindow()) == NULL) {
@@ -104,7 +104,7 @@ __declspec(dllexport) int APIENTRY InstallHook() {
 	// We return 0 on success; 1 or GetLastError() on failure
 	// We can't set the hook more than once
 	if (g_bHookSet)	{
-		MessageBox(NULL, "You can't set the keyboard hook more than once.", "Warning", MB_OK | MB_ICONEXCLAMATION);
+		MessageBox(NULL, L"You can't set the keyboard hook more than once.", L"Warning", MB_OK | MB_ICONEXCLAMATION);
 		return 1;
 	} else {
 		hCurrentHook = SetWindowsHookEx(WH_KEYBOARD, KbHookProc, g_hInstance, 0);
@@ -124,7 +124,7 @@ __declspec(dllexport) int APIENTRY RemoveHook() {
 		else
 			g_bHookSet = FALSE;
 	} else {
-		MessageBox(NULL, "You can't remove a hook which isn't set.", "Warning", MB_OK | MB_ICONEXCLAMATION);
+		MessageBox(NULL, L"You can't remove a hook which isn't set.", L"Warning", MB_OK | MB_ICONEXCLAMATION);
 		return 1;
 	}
 	return 0;

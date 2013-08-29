@@ -3,12 +3,11 @@
 // Modifications by adpoliak to address issues with running pre-compiled binaries on Win7
 
 // Prototypes
-BOOL AddIconToSystemTray(HWND hWnd, UINT uID, LPSTR lpszTip); 
+BOOL AddIconToSystemTray(HWND hWnd, UINT uID, LPTSTR lpszTip); 
 BOOL RemoveIconFromSystemTray(HWND hWnd, UINT uID);
 BOOL ShowPopupMenu(HWND hWnd, POINT pOint);
 BOOL APIENTRY MainDlgProc(HWND hDlg, UINT Msg, UINT wParam, LONG lParam);
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                   LPSTR lpCmdLine, int nCmdShow);
+int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow);
 
 // Constants
 #define TRAY_CALLBACK	10001
@@ -16,7 +15,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #define IDM_MEXIT		500
 #define IDM_MMAIN		501
 
-#define VITRITE_VERSION	"1.1.1-adpoliak"
+#define VITRITE_VERSION	L"1.1.1-adpoliak"
 
 
 #endif	// VITRITE_H
