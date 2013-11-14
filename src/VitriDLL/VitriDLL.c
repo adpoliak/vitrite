@@ -46,9 +46,7 @@ LRESULT CALLBACK KbHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 	char cString[155]="";	// DEBUG
 	if (nCode >= 0)	{
-		if ((!(HIWORD(lParam) & KF_UP)) &&		// Is this a key down situation?
-			(!(HIWORD(lParam) & KF_REPEAT)) &&	// Or a repeating key?
-			(!(HIWORD(lParam) & KF_EXTENDED))) {// Or one on the numpad?
+		if (HIWORD(lParam) & KF_UP){  // Is this a key up situation?
 			if ((((BYTE)GetKeyState(VK_SHIFT))>>7 || ((BYTE)GetKeyState(VK_RSHIFT))>>7 || ((BYTE)GetKeyState(VK_LSHIFT))>>7) &&
 				(((BYTE)GetKeyState(VK_CONTROL))>>7 || ((BYTE)GetKeyState(VK_RCONTROL))>>7 || ((BYTE)GetKeyState(VK_LCONTROL))>>7)) {
 				if ((wParam>=0x030) && (wParam<=0x039))	{// Is this a number key?
