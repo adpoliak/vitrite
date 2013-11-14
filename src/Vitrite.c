@@ -147,6 +147,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	OSVERSIONINFO  OSVInfo;
 
 	// Make sure the OS supports transparency
+#pragma warning(disable:4996)
 	memset(&OSVInfo, 0, sizeof(OSVInfo));
 	OSVInfo.dwOSVersionInfoSize = sizeof(OSVInfo);
 	if (!GetVersionEx(&OSVInfo)) {
@@ -158,6 +159,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 			return 1;
 		}
 	}
+#pragma warning(default:4996)
 
 	g_hInstance = hInstance;
 
